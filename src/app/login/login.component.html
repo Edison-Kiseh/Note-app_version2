@@ -1,0 +1,22 @@
+<form [formGroup]="form" (ngSubmit)="submitForm()">
+    <h1>Login</h1>
+    <span *ngIf="!form.valid && form.touched" class="errorMessage"><i>The email or password is incorrect</i></span>
+
+    <div class="form-group">
+      <label for="email">Email address</label>
+      <input type="email" id="email" formControlName="email" placeholder="Enter email" class="form-control" >
+      <span *ngIf="!email.valid && email.touched" class="errorMessage"><i>Please enter a valid email</i></span>
+    </div>
+
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input type="password" id="password" formControlName="password" placeholder="Password" class="form-control">
+      <span *ngIf="!password.valid && password.touched" class="errorMessage"><i></i></span>
+    </div>
+
+    <div class="bottom"> 
+        <button type="submit" class="btn btn-primary" [disabled]="!form.valid">Submit</button>
+    
+        <p>Don't yet have an acccount? Sign up <a [routerLink]="'/signup'">here</a></p>
+    </div>
+</form>
