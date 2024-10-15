@@ -15,6 +15,7 @@ import { HomeNotebooksComponent } from '../home-notebooks/home-notebooks.compone
 import { Bin } from '../models/bin.model';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { NoteparentTitlePipe } from '../pipes/noteparent-title.pipe';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -52,6 +53,7 @@ export class HomeComponent {
   notesSearchContent: string = ""
   allNotesactive: boolean = false  
   notebookActivated: boolean = false
+  notebookSubscription!: Subscription;
 
   constructor(private route: ActivatedRoute, private notebooksService: BookDBServiceService, private notesService: NotesDBServiceService){}
   private nextNoteId: number = 1;
@@ -107,11 +109,20 @@ export class HomeComponent {
   }
 
   getNoteBooks(): void{
-    this.notebooksService.getNotebooks().subscribe({
-      next: (books: Notebook[]) => {
-        this.notebooks = books;
+    // this.notebooksService.getNotebooks().subscribe({
+    //   next: (books: Notebook[]) => {
+    //     this.notebooks = books;
+    //   },
+    //   error: (error) => console.log('DB notebooks fetch error: ', error)
+    // });
+    this.notebookSubscription = this.notebooksService.getNotebooks().subscribe({
+      next: (notebooks) => {
+        this.notebooks = notebooks;
+        console.log(this.notebooks);
       },
-      error: (error) => console.log('DB notebooks fetch error: ', error)
+      error: (err) => {
+        console.log(err);
+      }
     });
   }
 
@@ -434,6 +445,12 @@ export class HomeComponent {
       colour += letters[Math.floor(Math.random() * 16)];
     }
     return colour;
+  }
+
+  ngOnDestroy(): void{
+    if(this.notebookSubscription){
+      this.notebookSubscription.unsubscribe();
+    }
   }
   
 }

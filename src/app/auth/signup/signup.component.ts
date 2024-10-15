@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
+import { AuthService } from '../auth.service';
 
 @Component({
   selector: 'app-signup',
@@ -16,7 +17,7 @@ export class SignupComponent {
   passwordPattern: RegExp = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/
   userNamePattern: RegExp = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{4,}$/;
 
-  constructor(private fb: FormBuilder){}
+  constructor(private fb: FormBuilder, private authService: AuthService, private router: Router){}
 
   ngOnInit(): void{
     this.form = this.fb.group({
@@ -27,8 +28,19 @@ export class SignupComponent {
     })
   }
 
-  submitForm(): void{
-    console.log(this.form); 
+  onSignUp(): void {
+    const email = this.form.value.email;
+    const password = this.form.value.password;
+
+    this.authService.signup(email, password)
+      .then((res) => {
+        if (res === 'success') {
+          // this.router.navigate(['login']);
+          alert('success');
+        } else {
+          alert(res);
+        }
+    });
   }
 
   get firstName(){

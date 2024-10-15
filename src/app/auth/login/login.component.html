@@ -1,6 +1,10 @@
-<form [formGroup]="form" (ngSubmit)="submitForm()">
+<form [formGroup]="form" (ngSubmit)="onLogin()">
     <h1>Login</h1>
-    <span *ngIf="!form.valid && form.touched" class="errorMessage"><i>The email or password is incorrect</i></span>
+    <!-- <span *ngIf="!form.valid && form.touched" class="errorMessage"><i>The email or password is incorrect</i></span> -->
+    <!-- <span *ngIf="invalidLogin" class="errorMessage"><i>The email or password is incorrect</i></span> -->
+    <div *ngIf="invalidLogin" class="alert alert-danger">
+      Invalid username and/or password
+    </div>
 
     <div class="form-group">
       <label for="email">Email address</label>

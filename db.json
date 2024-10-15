@@ -24,6 +24,30 @@
       "text": "<h1>\t\t\t\t\t\t\t\t\t\t\t\t\t\t<u>Final remarks</u></h1><p><br></p><p>\tTesting the functionality of the note application, to see if fully functional. Yeah, it's not too professional but it'll do. <em>Man! why do I feel like this course is worth 6 credits instead of 3?</em> Maybe it's just always my tendency to make things unnecessary harder than they ought to be. Anyways...I'm glad its now over.</p><p><br></p><p><strong class=\"ql-size-large\">Please be nice with the grading :)</strong></p>",
       "time": "2024-05-26T17:15:42.753Z",
       "img": "src/assets/images/allnotes.png"
+    },
+    {
+      "id": "5041",
+      "notebookId": "5c69ccHFqacqThLA7NyX",
+      "title": "New note",
+      "text": "",
+      "time": "2024-10-14T12:45:46.878Z",
+      "img": "src/assets/images/allnotes.png"
+    },
+    {
+      "id": "6822",
+      "notebookId": "5c69ccHFqacqThLA7NyX",
+      "title": "New note",
+      "text": "<p>dfasdf</p>",
+      "time": "2024-10-14T12:45:48.618Z",
+      "img": "src/assets/images/allnotes.png"
+    },
+    {
+      "id": "4882",
+      "notebookId": "EXkIuzwRHMTenRnrdPQg",
+      "title": "New note",
+      "text": "",
+      "time": "2024-10-14T12:45:58.958Z",
+      "img": "src/assets/images/allnotes.png"
     }
   ],
   "deletedNotes": [
@@ -33,6 +57,14 @@
       "time": "2024-10-10T17:19:54.716Z",
       "img": "/assets/images/allnotes.png",
       "type": "note",
+      "text": ""
+    },
+    {
+      "id": "lYbU0x6GNqSm8mZH0xyD",
+      "title": "Testing",
+      "time": "2024-10-14T12:25:50.032Z",
+      "img": "/assets/images/notebook.jpg",
+      "type": "notebook",
       "text": ""
     }
   ]
