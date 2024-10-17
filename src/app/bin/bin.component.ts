@@ -10,6 +10,7 @@ import { Note } from '../models/note.model';
 import { Notebook } from '../models/notebooks.model';
 import { FormsModule } from '@angular/forms';
 import { NotebookTitlePipe } from '../pipes/notebook-title.pipe';
+import { Timestamp } from '@angular/fire/firestore';
 
 @Component({
   selector: 'app-home',
@@ -99,8 +100,8 @@ export class BinComponent {
       restoreNote.id = noteId
       restoreNote.img = 'src/assets/images/allnotes.png'
       restoreNote.text = this.deletedStuff[index].text
-      restoreNote.time = new Date
-      restoreNote.title = this.deletedStuff[index].title
+      restoreNote.time = Timestamp.now()
+      restoreNote.name= this.deletedStuff[index].name
 
       this.notesService.addNote(restoreNote).subscribe({
         next: () => {
@@ -115,7 +116,7 @@ export class BinComponent {
 
       restoreNotebook.id = noteId
       restoreNotebook.img = '../../assets/images/notebook.jpg'
-      restoreNotebook.name = this.deletedStuff[index].title
+      restoreNotebook.name = this.deletedStuff[index].name
 
       this.notebooksService.addNewNoteBook(restoreNotebook).subscribe({
         next: () => {
@@ -142,7 +143,7 @@ export class BinComponent {
     
     if (searchTerm) {
       // Filter notes based on the search term
-      this.deletedStuff = this.tempDeletedStuff.filter(n => n.title.toLowerCase().includes(searchTerm));
+      this.deletedStuff = this.tempDeletedStuff.filter(n => n.name.toLowerCase().includes(searchTerm));
     } else {
       // If the search term is empty, restore the original list of notes
       this.deletedStuff = [...this.tempDeletedStuff];    }
@@ -151,8 +152,8 @@ export class BinComponent {
   //sorting alphabetically
   sortNotesAlphabetically(): void {
     this.deletedStuff.sort((a, b) => {
-        const titleA = a.title.toUpperCase(); // Convert titles to uppercase
-        const titleB = b.title.toUpperCase();
+        const titleA = a.name.toUpperCase(); // Convert titles to uppercase
+        const titleB = b.name.toUpperCase();
         if (titleA < titleB) {
             return -1; // Title A comes before title B
         }
@@ -166,8 +167,8 @@ export class BinComponent {
   //sorting by date
   sortNotesByDateDeleted(): void {
     this.deletedStuff.sort((a, b) => {
-        const dateA = new Date(a.time);
-        const dateB = new Date(b.time);
+        const dateA = a.time.toDate();
+        const dateB = a.time.toDate();
 
         if (dateA < dateB) {
             return 1; 

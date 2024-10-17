@@ -4,7 +4,7 @@ import { Note } from '../models/note.model';
 import { Bin } from '../models/bin.model';
 import { from, Observable } from 'rxjs';
 import { Notebook } from '../models/notebooks.model';
-import { addDoc, collection, collectionData, CollectionReference, doc, Firestore, setDoc } from '@angular/fire/firestore';
+import { collection, collectionData, CollectionReference, doc, DocumentData, Firestore, setDoc, where, query, DocumentReference, deleteDoc, updateDoc } from '@angular/fire/firestore';
 
 @Injectable({
   providedIn: 'root'
@@ -13,28 +13,20 @@ export class NotesDBServiceService {
 
   constructor(private http: HttpClient, private db: Firestore){}
 
-  // getNotes(NBId: string): Observable<Note[]> {
-  //   if(NBId == ""){
-  //     const url = "http://localhost:3000/notes";
-  //     return this.http.get<Note[]>(url);
-  //   }
-  //   else{
-  //     const url = "http://localhost:3000/notes?notebookId=" + NBId;
-  //     return this.http.get<Note[]>(url);
-  //   }
-  // }
-
   getNotes(NBId: string): Observable<Note[]> {
-    if(NBId == ""){
+    if(!NBId){
       return collectionData<Note>(
-        collection(this.db, 'notes') as CollectionReference<Note>,
+        collection(this.db, 'notes/') as CollectionReference<Note>,
         {idField: 'id'}
       )
     }
     else{
       return collectionData<Note>(
-        collection(this.db, 'notes/' + NBId) as CollectionReference<Note>,
-        {idField: 'id',}
+        query<Note, DocumentData>(
+          collection(this.db, 'notes/') as CollectionReference<Note>,
+          where('notebookId', '==', NBId)
+        ),
+        { idField: 'id' } 
       )
     }
   }
@@ -44,9 +36,27 @@ export class NotesDBServiceService {
     return this.http.get<Note[]>(url);
   }
 
-  addNote(note: Note): Observable<Note>{
-    const url = "http://localhost:3000/notes";
-    return this.http.post<Note>(url, note);
+  // addNote(note: Note): Observable<Note>{
+  //   const url = "http://localhost:3000/notes";
+  //   return this.http.post<Note>(url, note);
+  // }
+
+  //adding a new notebook
+  addNote(note: Note) {
+    const newID = doc(collection(this.db, 'id')).id;
+    const ref = doc(this.db, 'notes/' + newID);
+
+    //doing this because setDoc requires a javascript object
+    const noteData = {
+      id: note.id,
+      img: note.img, 
+      name: note.name,
+      notebookId: note.notebookId,
+      time: note.time, 
+      text: note.text
+    };
+
+    return from(setDoc(ref, noteData));
   }
 
   //adding a new notebook
@@ -67,44 +77,84 @@ export class NotesDBServiceService {
   //   return from(setDoc(ref, noteData));
   // }
 
-  updateNoteName(note: Note): Observable<Note>{
-    const url = `http://localhost:3000/notes/` + note.id;
-    return this.http.patch<Note>(url, note);
-  }
+  // updateNoteName(note: Note): Observable<Note>{
+  //   const url = `http://localhost:3000/notes/` + note.id;
+  //   return this.http.patch<Note>(url, note);
+  // }
 
-  saveNoteTitle(noteId: string, updatedNote: Note): Observable<Note> {
-    const url = `http://localhost:3000/notes/${noteId}`;
-    return this.http.patch<Note>(url, updatedNote);
-  }
+  // saveNoteTitle(noteId: string, updatedNote: Note): Observable<Note> {
+  //   const noteRef = doc(this.db, 'notes/' + updatedNote.id) as DocumentReference<Note>;
+    
+  //   //doing this because setDoc requires a javascript object
+  //   const noteData = {
+  //     id: updatedNote.id,
+  //     img: updatedNote.img, 
+  //     name: updatedNote.name,
+  //     notebookId: updatedNote.notebookId,
+  //     time: updatedNote.time, 
+  //     text: updatedNote.text
+  //   };
+    
+  //   return from(updateDoc(noteRef, noteData));
+  // }
   
-  saveNoteText(noteId: string, updatedNote: Note): Observable<Note> {
-    const url = `http://localhost:3000/notes/${noteId}`;
-    return this.http.put<Note>(url, updatedNote);
+  updateNote(note: Note) {
+    const noteRef = doc(this.db, 'notes/' + note.id) as DocumentReference<Note>;
+    
+    //doing this because setDoc requires a javascript object
+    const noteData = {
+      id: note.id,
+      img: note.img, 
+      name: note.name,
+      notebookId: note.notebookId,
+      time: note.time, 
+      text: note.text
+    };
+    
+    return from(updateDoc(noteRef, noteData));
   }
 
-  moveNoteToRecycleBin(note: Bin): Observable<Bin> {
-    const url = "http://localhost:3000/deletedNotes";
-    return this.http.post<Bin>(url, note);
+  moveNoteToRecycleBin(stuff: Bin) {
+    const newID = doc(collection(this.db, 'id')).id;
+    const ref = doc(this.db, 'bin/' + newID);
+
+    //doing this because setDoc requires a javascript object
+    const notebookData = {
+      id: stuff.id,
+      img: stuff.img, 
+      name: stuff.name,
+      text: stuff.text,
+      type: stuff.type,
+      time: stuff.time
+    };
+
+    return from(setDoc(ref, notebookData));
   }
 
-  deleteNote(noteId: string): Observable<any>{
-    const url = `http://localhost:3000/notes/${noteId}`;
-    return this.http.delete(url);
+  deleteNote(noteId: string) {
+    const noteRef = doc(this.db, 'notes/' + noteId) as DocumentReference<Note>;
+    return from(deleteDoc(noteRef));
   }
 
   deleteDeletedNotes(noteId: string): Observable<any>{
-    const url = "http://localhost:3000/deletedNotes/" + noteId;
-    return this.http.delete(url);
+    const noteRef = doc(this.db, 'bin/' + noteId) as DocumentReference<Note>;
+    return from(deleteDoc(noteRef));
   }
 
-  getDeletedNotes(): Observable<Bin[]>{
-    const url = "http://localhost:3000/deletedNotes"
-    return this.http.get<Bin[]>(url);
+  getDeletedNotes(): Observable<Bin[]> {
+    return collectionData<Bin>(
+      collection(this.db, 'bin/') as CollectionReference<Bin>,
+      {idField: 'id'}
+    )
   }
 
   getNotesByNotebookId(notebookId: string): Observable<Note[]> {
-    const url = "http://localhost:3000/notes?notebookId=" + notebookId;
-    return this.http.get<Note[]>(url);
+    return collectionData<Note>(
+      query<Note, DocumentData>(
+        collection(this.db, '/notes') as CollectionReference<Note>,
+        where('notebookId', '==', notebookId)
+      ),
+      { idField: 'id' } 
+    );
   }
-
 }

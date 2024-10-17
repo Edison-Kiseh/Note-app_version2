@@ -24,7 +24,7 @@ export class HomeNotesComponent {
   editing = new Array(this.notes.length).fill(false);
 
   calculateMinutes(index: number): string{
-    const noteTime = new Date(this.notes[index].time);
+    const noteTime = new Date(this.notes[index].time.toDate());
     const currentTime = new Date();
     const elapsedTimeMilliseconds = currentTime.getTime() - noteTime.getTime();
     const elapsedTimeSeconds = Math.floor(elapsedTimeMilliseconds / 1000);

@@ -75,7 +75,7 @@ export class HomeNotebooksComponent {
 
   setSelectedNoteBookIndex(index: number): void{
     this.selectedNoteBookIndex = index
-    console.log(this.selectedNoteBookIndex)
+    // console.log(this.selectedNoteBookIndex)
   }
 
   hideList() {

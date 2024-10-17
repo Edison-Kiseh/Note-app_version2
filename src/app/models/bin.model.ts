@@ -1,15 +1,17 @@
+import { Timestamp } from "@angular/fire/firestore";
+
 export class Bin{
     id: string;
-    title: string;
-    time: Date;
+    name: string;
+    time: Timestamp;
     img: string;
     type: string;
     text: string;
 
     constructor(){
         this.id = ''
-        this.title = '', 
-        this.time = new Date, 
+        this.name = '', 
+        this.time = Timestamp.now(), 
         this.img = '', 
         this.type = ''
         this.text = ''

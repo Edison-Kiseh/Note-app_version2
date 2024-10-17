@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Notebook } from '../models/notebooks.model';
 import { HttpClient } from '@angular/common/http';
 import { from, Observable } from 'rxjs';
-import { collection, collectionData, CollectionReference, deleteDoc, doc, DocumentReference, Firestore, setDoc, updateDoc } from '@angular/fire/firestore';
+import { query, collection, collectionData, CollectionReference, deleteDoc, doc, DocumentData, DocumentReference, Firestore, setDoc, updateDoc, where, docData } from '@angular/fire/firestore';
 
 @Injectable({
   providedIn: 'root'
@@ -64,14 +64,16 @@ export class BookDBServiceService {
     return this.http.delete<String>(url);
   }
 
-  getSingleNotebook(id: string): Observable<Notebook>{
-    const url = "http://localhost:3000/notebooks/" + id;
-    return this.http.get<Notebook>(url);
+  getSingleNotebook(id: string): Observable<Notebook | undefined>{
+    return docData<Notebook> (
+      doc(this.db, 'notebooks/' + id) as DocumentReference<Notebook>,
+      {idField: 'id'}
+    )
   }
 
   getNotebooks(): Observable<Notebook[]> {
     return collectionData<Notebook>(
-      collection(this.db, 'notebooks') as CollectionReference<Notebook>,
+      collection(this.db, 'notebooks/') as CollectionReference<Notebook>,
       {idField: 'id'}
     )
   }

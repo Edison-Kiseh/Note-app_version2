@@ -16,11 +16,13 @@ import { Bin } from '../models/bin.model';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { NoteparentTitlePipe } from '../pipes/noteparent-title.pipe';
 import { Subscription } from 'rxjs';
+import { WordCountDirective } from '../word-count.directive';
+import { Timestamp } from '@angular/fire/firestore';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [FormsModule, QuillModule, RouterModule, NotebookTitlePipe, CommonModule, HomeNotebooksComponent, HomeNotesComponent, NoteparentTitlePipe],
+  imports: [FormsModule, QuillModule, RouterModule, NotebookTitlePipe, CommonModule, HomeNotebooksComponent, HomeNotesComponent, NoteparentTitlePipe, WordCountDirective],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
   providers:[BookDBServiceService, NotesDBServiceService]
@@ -36,7 +38,7 @@ export class HomeComponent {
   tempNotesArray: Note[] = []
   notesToBeDeleted: Note[] = []
   noteTextArea: Quill | null = null
-  currentTime: Date = new Date
+  currentTime: Timestamp = Timestamp.now()
   notesParentName: string = "All notes"
   newNoteBook: Notebook = new Notebook()
   notebook: Notebook = new Notebook()
@@ -54,6 +56,7 @@ export class HomeComponent {
   allNotesactive: boolean = false  
   notebookActivated: boolean = false
   notebookSubscription!: Subscription;
+  numberOfWords: number = 0;
 
   constructor(private route: ActivatedRoute, private notebooksService: BookDBServiceService, private notesService: NotesDBServiceService){}
   private nextNoteId: number = 1;
@@ -92,7 +95,6 @@ export class HomeComponent {
       },
       theme: 'snow'
     });
-    
 
     this.noteTextArea.on('text-change', (delta, oldDelta, source) => {
       if (source === 'user') {
@@ -101,20 +103,9 @@ export class HomeComponent {
         this.handleTextChanged();
       }
     });
-
-    // this.noteTextArea = quill
-    //fetch all the notebooks from db
-    // this.newNoteForEditing = this.notes[0]
-    // this.fetchNotebookId();
   }
 
   getNoteBooks(): void{
-    // this.notebooksService.getNotebooks().subscribe({
-    //   next: (books: Notebook[]) => {
-    //     this.notebooks = books;
-    //   },
-    //   error: (error) => console.log('DB notebooks fetch error: ', error)
-    // });
     this.notebookSubscription = this.notebooksService.getNotebooks().subscribe({
       next: (notebooks) => {
         this.notebooks = notebooks;
@@ -142,6 +133,7 @@ export class HomeComponent {
     this.notesService.getNotes(this.currentNbId).subscribe({
       next: (note: Note[]) => {
         this.notes = note;
+        // console.log("Note names: " + this.notes[0].text);
         this.tempNotesArray = [...this.notes];//copying the notes to a temporary array to be used in the search function later
         if (this.notes.length > 0) {
             this.newNoteForEditing = this.notes[0];
@@ -160,6 +152,7 @@ export class HomeComponent {
       next: () => {
         console.log('New note added');
         this.notes.push(newNote); // Push the new instance into the array
+        // this.getNotes();
       },
       error: (error) => console.log('Adding note error ', error)
     });
@@ -168,8 +161,8 @@ export class HomeComponent {
   displayNoteText(index: number): void{
     if(this.noteTextArea){
       this.noteTextArea.clipboard.dangerouslyPasteHTML(this.notes[index].text);//to be able to read the html and not sanitize it
-      this.noteTitle = this.notes[index].title
-      this.currentTime = this.notes[index].time
+      this.noteTitle = this.notes[index].name
+      this.currentTime = this.notes[index].time;
       this.newNoteForEditing = this.notes[index];
       this.currentNoteID = this.notes[index].id.toString();
       this.currentNoteIndex = index
@@ -208,10 +201,10 @@ export class HomeComponent {
   }
 
   saveNoteTitle() {
-    this.notesService.saveNoteTitle(this.currentNoteID, this.newNoteForEditing).subscribe({
+    this.notesService.updateNote(this.newNoteForEditing).subscribe({
       next: (updatedNote) => {
         console.log('Note title updated');
-        this.newNoteForEditing = updatedNote;
+        // this.newNoteForEditing = updatedNote;
         this.isEditing = false
         this.getNotes()
       },
@@ -236,8 +229,8 @@ export class HomeComponent {
 
     this.binProducts.id = note.id
     this.binProducts.img = '/assets/images/allnotes.png'
-    this.binProducts.time = new Date()
-    this.binProducts.title = note.title
+    this.binProducts.time =  Timestamp.now()
+    this.binProducts.name = note.name
     this.binProducts.type = 'note'
     this.binProducts.text = this.notes[index].text
 
@@ -276,7 +269,7 @@ export class HomeComponent {
       this.notes[this.currentNoteIndex].text = newText;
   
       // Save the updated note text to the database
-      this.notesService.saveNoteText(this.notes[this.currentNoteIndex].id.toString(), this.notes[this.currentNoteIndex]).subscribe({
+      this.notesService.updateNote(this.notes[this.currentNoteIndex]).subscribe({
         next: () => {
           console.log('Note text updated');
         },
@@ -295,15 +288,15 @@ export class HomeComponent {
     });
   }
 
-  // updateNoteName(note: Note): void{
-  //   this.notebooksService.updateNoteName(note).subscribe({
-  //     next: () => {
-  //       console.log('Note name updated');
-  //       this.getNotes();
-  //     },
-  //     error: (error) => console.log('Error updating notebook name ', error)
-  //   });
-  // }
+  updateNoteName(note: Note): void{
+    this.notesService.updateNote(note).subscribe({
+      next: () => {
+        console.log('Note name updated');
+        this.getNotes();
+      },
+      error: (error) => console.log('Error updating notebook name ', error)
+    });
+  }
 
   deleteNoteBook(index: number): void{
     const notebookId = this.notebooks[index].id;
@@ -331,8 +324,8 @@ export class HomeComponent {
 
     this.binProducts.id = notebook.id
     this.binProducts.img = '/assets/images/notebook.jpg'
-    this.binProducts.time = new Date()
-    this.binProducts.title = notebook.name
+    this.binProducts.time = Timestamp.now()
+    this.binProducts.name = notebook.name
     this.binProducts.type = 'notebook'
 
     //same service used here for the notes, could've replicated it in the notebooks service, but it'll just be redundant data
@@ -357,8 +350,6 @@ export class HomeComponent {
   }
 
   notebookActivate(): string{
-    // this.notebookActivated = !this.notebookActivated//this is basically just there to set the css to show that the notebook is the one active in the case when the notebook has been clicked from the notebooks page
-    // return this.notebookActivated
     this.fetchCurrentNotebookId()
     return this.currentNbId
   }
@@ -367,10 +358,15 @@ export class HomeComponent {
     if (this.currentNbId) {
       this.getNotes()
       this.notebooksService.getSingleNotebook(this.currentNbId).subscribe({
-        next: (notebook: Notebook) => {
-          this.notebook = notebook;
-          this.notesParentName = notebook.name;
-          console.log("Fetched notebook with ID:", this.currentNbId, "Data:", this.notebook);
+        next: (notebook: Notebook | undefined) => {
+          if(notebook){
+            this.notebook = notebook;
+            this.notesParentName = notebook.name;
+            console.log("Fetched notebook with ID:", this.currentNbId, "Data:", this.notebook);
+          }
+          else{
+            console.log("Document not found");
+          }
         },
         error: (error) => {
           console.error('Error fetching notebook:', error);
@@ -398,8 +394,8 @@ export class HomeComponent {
   //sorting alphabetically
   sortNotesAlphabetically(): void {
     this.notes.sort((a, b) => {
-        const titleA = a.title.toUpperCase(); // Convert titles to uppercase
-        const titleB = b.title.toUpperCase();
+        const titleA = a.name.toUpperCase(); // Convert titles to uppercase
+        const titleB = b.name.toUpperCase();
         if (titleA < titleB) {
             return -1; // Title A comes before title B
         }
@@ -413,8 +409,8 @@ export class HomeComponent {
   //sorting by date
   sortNotesByDateCreated(): void {
     this.notes.sort((a, b) => {
-        const dateA = new Date(a.time);
-        const dateB = new Date(b.time);
+      const dateA = a.time.toDate();
+      const dateB = a.time.toDate();
 
         if (dateA < dateB) {
             return -1; 
@@ -432,7 +428,7 @@ export class HomeComponent {
     
     if (searchTerm) {
       // Filter notes based on the search term
-      this.notes = this.tempNotesArray.filter(n => n.title.toLowerCase().includes(searchTerm));
+      this.notes = this.tempNotesArray.filter(n => n.name.toLowerCase().includes(searchTerm));
     } else {
       // If the search term is empty, restore the original list of notes
       this.notes = [...this.tempNotesArray];    }

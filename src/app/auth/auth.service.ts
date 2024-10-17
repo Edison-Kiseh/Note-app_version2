@@ -51,4 +51,13 @@ export class AuthService {
   isLoggedIn(): boolean{
     return this.token != null;
   }
+
+  getUserID() {
+    if(this.auth.currentUser){
+      return this.auth.currentUser.uid;
+    }
+    else{
+      return null;
+    }
+  }
 }

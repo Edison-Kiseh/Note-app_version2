@@ -10,6 +10,7 @@ import { Bin } from '../models/bin.model';
 // import { HomeNotesComponent } from '../home-notes/home-notes.component';
 import { Note } from '../models/note.model';
 import { NotebookTitlePipe } from '../pipes/notebook-title.pipe';
+import { Timestamp } from '@angular/fire/firestore';
 
 @Component({
   selector: 'app-notebooks',
@@ -91,8 +92,8 @@ export class NotebooksComponent {
 
   sortNotebooksByDateCreated(): void {
     this.notebooks.sort((a, b) => {
-      const dateA = new Date(a.time);
-      const dateB = new Date(b.time);
+      const dateA = a.time.toDate();
+      const dateB = b.time.toDate();
       return dateA < dateB ? -1 : dateA > dateB ? 1 : 0;
     });
   }
@@ -114,7 +115,7 @@ export class NotebooksComponent {
 
   addNewNoteBook(): void {
     const newNotebook: Notebook = new Notebook();
-    newNotebook.id = this.getNextId().toString();
+    // newNotebook.id = this.getNextId().toString();
     this.notebooksService.addNewNoteBook(newNotebook).subscribe({
       next: () => {
         console.log("Notebook has been added");
@@ -182,8 +183,8 @@ export class NotebooksComponent {
 
     this.binProducts.id = note.id
     this.binProducts.img = '/assets/images/allnotes.png'
-    this.binProducts.time = new Date()
-    this.binProducts.title = note.title
+    this.binProducts.time = Timestamp.now()
+    this.binProducts.name = note.name
     this.binProducts.type = 'note'
     this.binProducts.text = this.notes[index].text
 
@@ -221,8 +222,8 @@ export class NotebooksComponent {
 
     this.binProducts.id = notebook.id;
     this.binProducts.img = '/assets/images/notebook.jpg';
-    this.binProducts.time = new Date();
-    this.binProducts.title = notebook.name;
+    this.binProducts.time =  Timestamp.now();
+    this.binProducts.name = notebook.name;
     this.binProducts.type = 'notebook';
 
     this.notesService.moveNoteToRecycleBin(this.binProducts).subscribe({
@@ -256,8 +257,8 @@ export class NotebooksComponent {
   //sorting by date
   sortNotesByDateCreated(): void {
     this.notebooks.sort((a, b) => {
-      const dateA = new Date(a.time);
-      const dateB = new Date(b.time);
+      const dateA = a.time.toDate();
+      const dateB = a.time.toDate();
 
       if (dateA < dateB) {
           return -1; 

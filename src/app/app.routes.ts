@@ -8,6 +8,7 @@ import { SignupComponent } from './auth/signup/signup.component';
 import { LoginComponent } from './auth/login/login.component';
 import { StartupComponent } from './startup/startup.component';
 import { loggedInGuard } from './logged-in.guard';
+import { AdminComponent } from './admin/admin.component';
 
 export const routes: Routes = [
     {path: '', component: HomeComponent, canActivate:[loggedInGuard]},
@@ -18,6 +19,7 @@ export const routes: Routes = [
     {path: 'logout', component: LogoutComponent},
     {path: 'signup', component: SignupComponent},
     {path: 'startup', component: StartupComponent},
+    {path: 'admin', component: AdminComponent},
     //
     {path: '404-page', component: PageNotFoundComponent},
     {path: '**', redirectTo: '/404-page'}

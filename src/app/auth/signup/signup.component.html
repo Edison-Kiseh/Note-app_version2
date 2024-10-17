@@ -5,7 +5,7 @@
         <label for="fname">First name</label>
         <input type="text" formControlName="firstName" class="form-control" id="fname" placeholder="First name">
         <span *ngIf="!firstName.valid && firstName.touched" class="errorMessage"><i>Fill in first name</i></span>
-        <span *ngIf="firstName.errors && firstName.errors['invalidFormat']" class="errorMessage"><i>Name must atleast contain 4 letters or number</i></span>
+        <!-- <span *ngIf="firstName.errors && firstName.errors['invalidFormat']" class="errorMessage"><i>Name must atleast contain 4 letters or number</i></span> -->
     </div>
 
     <div class="form-group">
@@ -26,5 +26,9 @@
       <span *ngIf="!password.valid && password.touched" class="errorMessage"><i>Your password must contain: at least 8 characters, containing letters and numbers</i></span>
     </div>
 
-    <button type="submit" class="btn btn-primary">Submit</button>
+    <div class="bottom"> 
+      <button type="submit" class="btn btn-primary" [disabled]="!form.valid">Submit</button>
+  
+      <p>Already have an acccount? Login <a [routerLink]="'/login'">here</a></p>
+  </div>
 </form>

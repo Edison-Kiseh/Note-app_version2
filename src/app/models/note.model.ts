@@ -1,17 +1,19 @@
+import { Timestamp } from "@angular/fire/firestore";
+
 export class Note{
     id: string;
     notebookId: string;
-    title: string;
+    name: string;
     text: string;
-    time: Date;
+    time: Timestamp;
     img: string;
 
     constructor(){
         this.id = ''
         this.notebookId = ''
-        this.title = 'New note', 
+        this.name = 'New note', 
         this.text = '',
-        this.time = new Date
+        this.time = Timestamp.now(), 
         this.img = 'src/assets/images/allnotes.png'
     }
 }

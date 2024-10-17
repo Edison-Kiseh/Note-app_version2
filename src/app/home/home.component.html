@@ -52,14 +52,14 @@
     <div class="col-8 right-side">
         <div class="header">
             <div *ngIf="!isEditing">
-                <h3><input type="text" (click)="editNoteTitle()" value="{{newNoteForEditing.title}}"></h3>
+                <h3><input type="text" (click)="editNoteTitle()" value="{{newNoteForEditing.name}}"></h3>
               </div>
               
             <div *ngIf="isEditing">
-                <h3><input type="text" [(ngModel)]="newNoteForEditing.title" (blur)="saveNoteTitle()" autofocus></h3>
+                <h3><input type="text" [(ngModel)]="newNoteForEditing.name" (blur)="saveNoteTitle()" autofocus></h3>
             </div>
 
-            <span>{{newNoteForEditing.time | date:'medium'}}</span>
+            <span><span>{{numberOfWords}} words </span><span>{{newNoteForEditing.time.toDate() | date:'medium'}}</span></span>   
         </div>
         <div id="editor"></div>
     </div>

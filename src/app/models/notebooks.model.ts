@@ -1,15 +1,17 @@
+import { Timestamp } from "@angular/fire/firestore";
+
 export class Notebook {
     id: string;
     name: string;
     img: string;
-    time: Date;
+    time: Timestamp;
     notecount: number;
   
     constructor() {
       this.id = "";
       this.name = "New notebook";
       this.img = '../../assets/images/notebook.jpg';
-      this.time = new Date;
+      this.time = Timestamp.now(), 
       this.notecount = 0;
     }
   }

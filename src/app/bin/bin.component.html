@@ -20,8 +20,8 @@
         <ng-container *ngFor="let stuff of deletedStuff; index as i">
             <div class="notebook-item" (click)="hideList()" (contextmenu)="setSelectedNoteBookIndex(i); showList($event)">
                 <img src="{{stuff.img}}" alt="notebook image" class="notebookImage"/><br/> 
-                <span>{{stuff.title | notebookTitle:20}}</span><br/>
-                <i>Deleted on the {{stuff.time | date:'short'}}</i>
+                <span>{{stuff.name | notebookTitle:20}}</span><br/>
+                <i>Deleted on the {{stuff.time.toDate() | date:'short'}}</i>
             </div>
         </ng-container>
     </div>

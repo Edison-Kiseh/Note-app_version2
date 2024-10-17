@@ -10,12 +10,14 @@
       <label for="email">Email address</label>
       <input type="email" id="email" formControlName="email" placeholder="Enter email" class="form-control" >
       <span *ngIf="!email.valid && email.touched" class="errorMessage"><i>Please enter a valid email</i></span>
+      <!-- <span *ngIf="email.errors?.['required'] && email.touched" class="errorMessage"><i>Password is required</i></span> -->
     </div>
 
     <div class="form-group">
       <label for="password">Password</label>
       <input type="password" id="password" formControlName="password" placeholder="Password" class="form-control">
-      <span *ngIf="!password.valid && password.touched" class="errorMessage"><i></i></span>
+      <!-- <span *ngIf="!password.valid && password.touched" class="errorMessage"><i></i></span> -->
+      <span *ngIf="password.errors?.['required'] && password.touched" class="errorMessage"><i>Password is required</i></span><!--checking whether the password field is empty or not-->
     </div>
 
     <div class="bottom"> 
