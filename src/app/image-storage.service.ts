@@ -18,6 +18,7 @@ export class ImageStorageService {
   bin: Bin = new Bin;
   deletedStuff: Bin[] = [];
   notes: Note[] = [];
+  typeToBeUpdated: string = "";
 
   constructor(private noteService: NotesDBServiceService, private storage: Storage, private db: Firestore, private notebooksService: BookDBServiceService, private binService: BinService) {}
 
@@ -71,6 +72,7 @@ export class ImageStorageService {
         if(imageType === 'notebook'){
           const updatePromises = this.notebooks.map((notebook) => {
             notebook.img = url;
+            this.typeToBeUpdated = 'notebook'
             // this.setupBinItem(notebook);
   
             this.notebooksService.updateNoteBook(notebook); 
@@ -87,6 +89,7 @@ export class ImageStorageService {
         else{
           const updatePromises = this.notes.map((note) => {
             note.img = url;
+            this.typeToBeUpdated = 'note'
             // this.setupBinItem(notebook);
   
             this.noteService.updateNote(note);
@@ -105,7 +108,7 @@ export class ImageStorageService {
     });
 
     //
-    this.updateDeletedStuff(url, "notebook");
+    this.updateDeletedStuff(url, this.typeToBeUpdated);
   }
 
   updateDeletedStuff(url: string, type: string) {
@@ -117,12 +120,7 @@ export class ImageStorageService {
         const updatePromises = this.deletedStuff.map((del) => {
           del.img = url;
 
-          if(del.type === "notebook"){
-            this.binService.updateStuff(del);
-          }
-          else{
-            this.binService.updateStuff(del);
-          }
+          this.binService.updateStuff(del, type);
         });
 
         try {

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Note } from '../models/note.model';
 import { Bin } from '../models/bin.model';
-import { from, Observable } from 'rxjs';
+import { from, Observable, Subject } from 'rxjs';
 import { Notebook } from '../models/notebooks.model';
 import { collection, collectionData, CollectionReference, doc, DocumentData, Firestore, setDoc, where, query, DocumentReference, deleteDoc, updateDoc } from '@angular/fire/firestore';
 
@@ -10,6 +10,7 @@ import { collection, collectionData, CollectionReference, doc, DocumentData, Fir
   providedIn: 'root'
 })
 export class NotesDBServiceService {
+  selectedNotebookNotesSubject = new Subject<Note[]>();
 
   constructor(private http: HttpClient, private db: Firestore){}
 
@@ -80,7 +81,13 @@ export class NotesDBServiceService {
     
     return from(updateDoc(noteRef, noteData));
   }
-  
+
+  //Function to emit notes for the selected notebook
+  selectNotebook(note: Note): void {
+    this.getNotesByNotebookId(note.notebookId).subscribe((notes: Note[]) => {
+      this.selectedNotebookNotesSubject.next(notes);
+    });
+  }
 
   moveNoteToRecycleBin(stuff: Bin) {
     const newID = doc(collection(this.db, 'id')).id;

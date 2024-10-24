@@ -1,47 +1,8 @@
-<!-- <h2>Manage users</h2>
-
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th scope="col">#</th>
-            <th scope="col">First</th>
-            <th scope="col">Last</th>
-            <th scope="col">Action</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr *ngFor="let user of users index as i">
-            <th scope="row">{{i+1}}</th>
-            <td>{{user.firstName}}</td>
-            <td>{{user.lastName}}</td>
-            <td><button class="btn btn-primary" [routerLink]="'/admin/editUser'">Modify</button><button class="btn btn-danger" (click)="onDeleteAccount(i+1)">Delete</button></td>
-        </tr>
-    </tbody>
-    <button class="btn btn-primary" [routerLink]="'/admin/addUser'">Add user</button>
-
-</table> -->
-
-<h2>Image Upload</h2>
-<div style="display: flex; justify-content: space-around;">
-    <div>
-        <h4>Change notebook image</h4>
-        <input type="file" (change)="selectImg($event)" accept="image/*" />
-        <button (click)="setFile('notebook')" [disabled]="!file">Upload Image</button>
-        <div *ngIf="imageUrl">
-          <p>Uploaded Image URL: {{ imageUrl }}</p>
-          <img [src]="imageUrl" alt="Uploaded Image" style="max-width: 300px; max-height: 300px;" />
-        </div>
-    </div>
-
-    <div>
-        <h4>Change note image</h4>
-        <input type="file" (change)="selectImg($event)" accept="image/*" />
-        <button (click)="setFile('note')" [disabled]="!file">Upload Image</button>
-        <div *ngIf="imageUrl">
-          <p>Uploaded Image URL: {{ imageUrl }}</p>
-          <img [src]="imageUrl" alt="Uploaded Image" style="max-width: 300px; max-height: 300px;" />
-        </div>
-    </div>
+<h2 style="text-align: center;">Manage images</h2>
+<div class="admin-menu" style="display: flex; justify-content: space-around; width: 40%; margin: auto; border: 1px solid black; padding: 120px;"> 
+    <a [routerLink]="'changeNotebookImage'"><button class="btn btn-primary">Manage Notebooks</button></a>
+    <a [routerLink]="'changeNoteImage'" ><button class="btn btn-primary">Manage Notes</button></a>
 </div>
-
-<!-- <router-outlet></router-outlet> -->
+  
+<router-outlet></router-outlet>
+  

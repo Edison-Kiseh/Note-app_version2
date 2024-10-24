@@ -11,21 +11,23 @@ import { loggedInGuard } from './logged-in.guard';
 import { AdminComponent } from './admin/admin.component';
 import { loggedOutGuard } from './logged-out.guard';
 import { adminGuardGuard } from './admin-guard.guard';
-import { HomeNotebooksComponent } from './note-app/home-notebooks/home-notebooks.component';
 import { deactivateGuardGuard } from './deactivate-guard.guard';
+import { ChangeNotebookImageComponent } from './admin/change-notebook-image/change-notebook-image.component';
+import { ChangeNoteImageComponent } from './admin/change-note-image/change-note-image.component';
 
 export const routes: Routes = [
     {path: '', component: HomeComponent, canActivate:[loggedInGuard]},
     {path: 'bin', component: BinComponent, canActivate:[loggedInGuard]},
-    {path: 'notebooks', component: NotebooksComponent, canActivate:[loggedInGuard],  children: [
-        {path: ':notebookId', component: HomeNotebooksComponent},
-    ]},
+    {path: 'notebooks', component: NotebooksComponent, canActivate:[loggedInGuard]},
     //newly added routes
     {path: 'login', component: LoginComponent, canActivate:[loggedOutGuard]},
     {path: 'logout', component: LogoutComponent, canActivate:[loggedOutGuard]},
     {path: 'signup', component: SignupComponent, canActivate:[loggedOutGuard]},
     {path: 'startup', component: StartupComponent},
-    {path: 'admin', component: AdminComponent, canActivate:[adminGuardGuard], canDeactivate: [deactivateGuardGuard]},
+    {path: 'admin', component: AdminComponent, canActivate:[adminGuardGuard], children: [
+        {path: 'changeNotebookImage', component: ChangeNotebookImageComponent, canDeactivate: [deactivateGuardGuard]},
+        {path: 'changeNoteImage', component: ChangeNoteImageComponent, canDeactivate: [deactivateGuardGuard],},
+    ]},
     //
     {path: '404-page', component: PageNotFoundComponent},
     {path: '**', redirectTo: '/404-page'}

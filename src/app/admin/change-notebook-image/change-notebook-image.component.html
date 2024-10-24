@@ -1,0 +1,6 @@
+<div>
+    <h2>Manage Notebooks</h2>
+    <input type="file" (change)="selectNotebookImg($event)" />
+    <button (click)="uploadNotebookImg()">Upload Notebook Image</button>
+    <p *ngIf="imageUrlForNotebook">Notebook Image URL: {{ imageUrlForNotebook }}</p>    
+</div>

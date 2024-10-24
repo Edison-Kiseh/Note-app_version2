@@ -1,0 +1,6 @@
+<div>
+    <h2>Manage Notes</h2>
+    <input type="file" (change)="selectNoteImg($event)" />
+    <button (click)="uploadNoteImg()">Upload Note Image</button>
+    <p *ngIf="imageUrlForNote">Note Image URL: {{ imageUrlForNote }}</p>
+</div>

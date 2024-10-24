@@ -16,25 +16,27 @@ export class BinService {
     return from(deleteDoc(binRef));
   }
 
-  updateStuff(stuff: Bin) {
-    // if(stuff.type === 'notebook') {
-      const bookRef = doc(this.db, 'bin/' + stuff.id) as DocumentReference<Bin>;
-    
-      //doing this because setDoc requires a javascript object
-      const notebookData = {
-        id: stuff.id,
-        img: stuff.img, 
-        name: stuff.name,
-        type: stuff.type,
-        text: stuff.text,
-        time: stuff.time
-      };
-      
-      console.log('updated bin items')
-      return from(updateDoc(bookRef, notebookData));
-    // }
-    // else{
-    //   return "WOw"
-    // }
+  updateStuff(stuff: Bin, type: string) {
+    console.log("type to be updated" + type);
+    const docRef = doc(this.db, 'bin/' + stuff.id) as DocumentReference<Bin>;
+  
+    const updatedData = {
+      id: stuff.id,
+      img: stuff.img,
+      name: stuff.name,
+      type: stuff.type, 
+      text: stuff.text,
+      time: stuff.time
+    };
+  
+    if(updatedData.type == type){
+      console.log('Updated bin item for ' + type);
+      return from(updateDoc(docRef, updatedData));
+    }
+    else{
+      console.log("invalid type");
+      return -1;
+    }
   }
+  
 }

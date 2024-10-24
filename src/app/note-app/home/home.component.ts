@@ -439,9 +439,9 @@ export class HomeComponent {
   //   }
   // }
 
-  // updateWordCount(count: number) {
-  //   this.wordCount = count;
-  // }
+  updateWordCount(count: number) {
+    this.wordCount = count;
+  }
 
   ngOnDestroy(): void{
     if(this.notebookSubscription){

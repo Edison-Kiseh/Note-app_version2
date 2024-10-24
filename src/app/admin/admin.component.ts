@@ -21,6 +21,11 @@ export class AdminComponent {
   file: File | null = null;
   imageUrl: string = "";
   imageUploaded: boolean = false;
+  fileForNotebook: File | null = null;
+  fileForNote: File | null = null;
+  imageUrlForNotebook: string | null = null;
+  imageUrlForNote: string | null = null;
+
   constructor(private userService: UserService, private authService: AuthService, private auth: Auth, private router: Router, private imageStorage: ImageStorageService){}
 
   ngOnInit(){
@@ -66,30 +71,51 @@ export class AdminComponent {
   //   }
   // }
 
-  selectImg(event: Event): void{
-    const target = event.target as HTMLInputElement;
 
-    if(target.files && target.files[0]){
-      this.file = target.files[0];
-      this.imageUploaded = false;
-      console.log(this.file.name);
+selectImg(event: Event, type: string): void {
+  const input = event.target as HTMLInputElement;
+  if (input.files && input.files.length > 0) {
+    const selectedFile = input.files[0];
+
+    if (type === 'notebook') {
+      this.fileForNotebook = selectedFile;
+    } else if (type === 'note') {
+      this.fileForNote = selectedFile;
     }
   }
-  
-  async setFile(imageType: string): Promise<void> {
-    if (this.file) {
-      const path = 'images/' + this.file.name; 
-      try {
-        this.imageUrl = await this.imageStorage.uploadImage(path, this.file, imageType); 
-        this.imageUploaded = true;
-        console.log("Uploaded Image URL:", this.imageUrl);
-      } catch (error) {
-        console.error("Error uploading image:", error); 
+}
+
+async setFile(imageType: string): Promise<void> {
+    let selectedFile: File | null = null;
+
+    if (imageType === 'notebook') {
+      selectedFile = this.fileForNotebook;
+    } else if (imageType === 'note') {
+      selectedFile = this.fileForNote;
+    }
+
+    if (!selectedFile) {
+      console.log("No file selected.");
+      return;
+    }
+
+    const path = 'images/' + selectedFile.name;
+    try {
+      if (imageType === 'notebook') {
+        this.imageUrlForNotebook = await this.imageStorage.uploadImage(path, selectedFile, imageType);
+        this.imageUrl = this.imageUrlForNotebook;
+      } else if (imageType === 'note') {
+        this.imageUrlForNote = await this.imageStorage.uploadImage(path, selectedFile, imageType);
+        this.imageUrl = this.imageUrlForNote;
       }
-    } else {
-      console.log("No file selected."); 
+
+      this.imageUploaded = true;
+      console.log("Uploaded Image URL:", this.imageUrl);
+    } catch (error) {
+      console.error("Error uploading image:", error);
     }
   }
+
 
   canDeactivate(): Observable<boolean> | Promise<boolean> | boolean {
     if (this.file && !this.imageUploaded) {

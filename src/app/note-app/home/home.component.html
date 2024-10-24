@@ -63,8 +63,8 @@
 
             <span><span>Number of words: {{ wordCount }}</span><span>{{newNoteForEditing.time.toDate() | date:'medium'}}</span></span>   
         </div>
-        <div id="editor" appWordCount></div>
-        <!-- (wordCountChange)="updateWordCount($event)"   -->
+        <div id="editor" appWordCount (wordCountChange)="updateWordCount($event)" ></div>
+        <!--    -->
         <div class="bottom-right">
             <button class="btn btn-secondary" (click)="handleTextChanged()"><b>Save Text</b></button>
         </div>
