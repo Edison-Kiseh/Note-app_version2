@@ -5,10 +5,10 @@
         <div class="sort-wrapper">
             <select class="sortOptions" (change)="handleSortChange($event)">
                 <option value="none">None</option>
-                <option value="dateCreated">By Date Created</option>
+                <option value="date">By Date Created</option>
                 <option value="alphabetically">Alphabetically</option>
                 <option value="numberNotes">Highest notes</option>
-            </select>            
+            </select>         
         </div>
     </div>
 
@@ -18,7 +18,7 @@
     </div>
 
     <div class="notebooks-container" *ngIf="notebooks.length > 0">
-        <ng-container *ngFor="let notebook of notebooks; index as i">
+        <ng-container *ngFor="let notebook of notebooks  | sorting: sortType; index as i">
             <div class="notebook-item" (contextmenu)="setSelectedNoteBookIndex(i); showList($event)">
                 <a href="#" [attr.href]="'/?id=' + notebook.id">
                     <img src="{{notebook.img}}" alt="notebook image" class="notebookImage"/>

@@ -4,26 +4,38 @@
     <div class="form-group">
         <label for="fname">First name</label>
         <input type="text" formControlName="firstName" class="form-control" id="fname" placeholder="First name">
-        <span *ngIf="!firstName.valid && firstName.touched" class="errorMessage"><i>Fill in first name</i></span>
-        <!-- <span *ngIf="firstName.errors && firstName.errors['invalidFormat']" class="errorMessage"><i>Name must atleast contain 4 letters or number</i></span> -->
+        <span *ngIf="!firstName.valid && firstName.touched" class="errorMessage">
+          <span *ngIf="firstName.errors && firstName.errors['invalidFormat']"><i>The first name should contain atleast 4 letters or numbers and no special characters</i></span>
+          <span *ngIf="firstName.errors && firstName.errors['required']"><i>This field is mandatory</i></span>
+        </span>
     </div>
 
     <div class="form-group">
         <label for="lname">Last name</label>
         <input type="text"  formControlName="lastName" class="form-control" id="lname" placeholder="Last name">
-        <span *ngIf="!lastName.valid && lastName.touched" class="errorMessage"><i>Fill in last name</i></span>
+        <span *ngIf="!lastName.valid && lastName.touched" class="errorMessage">
+          <span *ngIf="lastName.errors && lastName.errors['invalidFormat']"><i>The last name should contain atleast 4 letters or numbers and no special characters</i></span>
+          <span *ngIf="lastName.errors && lastName.errors['required']"><i>This field is mandatory</i></span>
+        </span>
     </div>
 
     <div class="form-group">
       <label for="email">Email address</label>
       <input type="email" formControlName="email" class="form-control" id="email" placeholder="Enter email">
-      <span *ngIf="!email.valid && email.touched" class="errorMessage"><i>Please enter a valid email</i></span>
+      <span *ngIf="!email.valid && email.touched" class="errorMessage">
+        <span *ngIf="email.errors && email.errors['invalidFormat']"><i>This is an invalid email</i></span>
+        <span *ngIf="email.errors && email.errors['required']"><i>This field is mandatory</i></span>
+        <span *ngIf="userExists"><i>User already exists with this email</i></span>
+      </span>
     </div>
 
     <div class="form-group">
       <label for="password">Password</label>
       <input type="password" formControlName="password" class="form-control" id="password" placeholder="Password">
-      <span *ngIf="!password.valid && password.touched" class="errorMessage"><i>Your password must contain: at least 8 characters, containing letters and numbers</i></span>
+      <span *ngIf="!password.valid && password.touched" class="errorMessage">
+        <span *ngIf="password.errors && password.errors['invalidFormat']"><i>Your password must contain: at least 8 characters, containing letters and numbers</i></span>
+        <span *ngIf="password.errors && password.errors['required']"><i>This field is mandatory</i></span>
+      </span>
     </div>
 
     <div class="bottom"> 

@@ -26,21 +26,23 @@
                 <img src="../../assets/images/sort.png" alt="sort" class="sort" (click)="showList($event)"/>
                 <div *ngIf="showListFlag" [style.left.px]="listPositionX" [style.top.px]="listPositionY" class="clicked-list">
                     <ul class="contextmenu">
-                        <li (click)="getNotes(); hideList()">None</li>
-                        <li (click)="sortNotesAlphabetically(); hideList()">Alphabetically</li>
-                        <li (click)="sortNotesByDateCreated(); hideList()">By date</li>
+                        <li (click)="setSortType('none'); hideList()">None</li>
+                        <li (click)="setSortType('alphabetically'); hideList()">Alphabetically</li>
+                        <li (click)="setSortType('date'); hideList()">By date</li>
                     </ul>
                 </div>
             </div>
 
             <div class="search-box">
                 <!-- <img src="../../assets/images/search-icon.png" alt="Search" class="search-icon"/> -->
-                <input type="text" placeholder="Search" class="search" [(ngModel)]="notesSearchContent" (input)="filterBy()"/>
+                <input type="text" placeholder="Search" class="search" [(ngModel)]="notesSearchContent"/>
             </div>
         </div>
         
         <app-home-notes
         [notesForChild]="notes"
+        [sortTypeForChild]="sortType"
+        [searchContent]="notesSearchContent"
         (displayNoteEvent)="displayNoteText($event)"
         (delNoteEvent)="moveNoteToRecycleBin($event)"
         (changedNotesNameEvent)="editNoteTitle()"
@@ -59,9 +61,13 @@
                 <h3><input type="text" [(ngModel)]="newNoteForEditing.name" (blur)="saveNoteTitle()" autofocus></h3>
             </div>
 
-            <span><span>{{numberOfWords}} words </span><span>{{newNoteForEditing.time.toDate() | date:'medium'}}</span></span>   
+            <span><span>Number of words: {{ wordCount }}</span><span>{{newNoteForEditing.time.toDate() | date:'medium'}}</span></span>   
         </div>
-        <div id="editor"></div>
+        <div id="editor" appWordCount></div>
+        <!-- (wordCountChange)="updateWordCount($event)"   -->
+        <div class="bottom-right">
+            <button class="btn btn-secondary" (click)="handleTextChanged()"><b>Save Text</b></button>
+        </div>
     </div>
 </div>
 

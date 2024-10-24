@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
 import { RouterModule, RouterOutlet } from '@angular/router';
-import { NotebooksComponent } from './notebooks/notebooks.component';
-import { HomeComponent } from './home/home.component';
+import { NotebooksComponent } from './note-app/notebooks/notebooks.component';
+import { HomeComponent } from './note-app/home/home.component';
 import { BinComponent } from './bin/bin.component';
-import { NavigationComponent } from './navigation/navigation.component';
-import { HomeNotebooksComponent } from './home-notebooks/home-notebooks.component';
+import { NavigationComponent } from './note-app/navigation/navigation.component';
+import { HomeNotebooksComponent } from './note-app/home-notebooks/home-notebooks.component';
 
 @Component({
   selector: 'app-root',

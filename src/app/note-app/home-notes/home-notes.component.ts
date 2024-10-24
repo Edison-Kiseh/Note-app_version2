@@ -1,14 +1,16 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Note } from '../models/note.model';
+import { Note } from '../../models/note.model';
 import { RouterModule } from '@angular/router';
-import { NoteTitlePipe } from '../pipes/note-title.pipe';
-import { NotePipePipe } from '../pipes/note-pipe.pipe';
+import { NoteTitlePipe } from '../../pipes/note-title.pipe';
+import { NotePipePipe } from '../../pipes/note-pipe.pipe';
+import { SortingPipe } from '../../pipes/sorting.pipe';
+import { FilterPipe } from '../../pipes/filter.pipe';
 
 @Component({
   selector: 'app-home-notes',
   standalone: true,
-  imports: [CommonModule, RouterModule, NoteTitlePipe, NotePipePipe],
+  imports: [CommonModule, RouterModule, NoteTitlePipe, NotePipePipe, SortingPipe, FilterPipe],
   templateUrl: './home-notes.component.html',
   styleUrl: './home-notes.component.css',
 })
@@ -18,6 +20,8 @@ export class HomeNotesComponent {
   listPositionY: number = 0;
   selectedNoteIndex: number = -1;
   @Input('notesForChild') notes: Note[] = []
+  @Input() sortTypeForChild: string = 'none'
+  @Input() searchContent: string = 'none'
   @Output() displayNoteEvent = new EventEmitter<number>()
   @Output() delNoteEvent = new EventEmitter<number>()
   @Output() changedNotesNameEvent = new EventEmitter<Note>()

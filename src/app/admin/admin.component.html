@@ -1,1 +1,35 @@
-<p>admin works!</p>
+<!-- <h2>Manage users</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">First</th>
+            <th scope="col">Last</th>
+            <th scope="col">Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let user of users index as i">
+            <th scope="row">{{i+1}}</th>
+            <td>{{user.firstName}}</td>
+            <td>{{user.lastName}}</td>
+            <td><button class="btn btn-primary" [routerLink]="'/admin/editUser'">Modify</button><button class="btn btn-danger" (click)="onDeleteAccount(i+1)">Delete</button></td>
+        </tr>
+    </tbody>
+    <button class="btn btn-primary" [routerLink]="'/admin/addUser'">Add user</button>
+
+</table> -->
+
+
+<div>
+    <h2>Image Upload</h2>
+    <input type="file" (change)="selectImg($event)" accept="image/*" />
+    <button (click)="setFile()" [disabled]="!file">Upload Image</button>
+    <div *ngIf="imageUrl">
+      <p>Uploaded Image URL: {{ imageUrl }}</p>
+      <img [src]="imageUrl" alt="Uploaded Image" style="max-width: 300px; max-height: 300px;" />
+    </div>
+</div>
+
+<!-- <router-outlet></router-outlet> -->

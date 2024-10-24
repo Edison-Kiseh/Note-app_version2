@@ -11,6 +11,7 @@ import { Notebook } from '../models/notebooks.model';
 import { FormsModule } from '@angular/forms';
 import { NotebookTitlePipe } from '../pipes/notebook-title.pipe';
 import { Timestamp } from '@angular/fire/firestore';
+import { ImageStorageService } from '../image-storage.service';
 
 @Component({
   selector: 'app-home',
@@ -29,11 +30,14 @@ export class BinComponent {
   tempDeletedStuff: Bin[] = []
   note: Note = new Note()
   binSearchContent: string = ""
+  notebookImageUrl: string = ''; 
+  noteImageUrl: string = '';
 
-  constructor(private notesService: NotesDBServiceService, private notebooksService: BookDBServiceService, private http: HttpClient, private binService: BinService){}
+  constructor(private notesService: NotesDBServiceService, private notebooksService: BookDBServiceService, private http: HttpClient, private binService: BinService, private imageService: ImageStorageService){}
 
   ngOnInit(): void {
     this.getDeletedNotes();
+    // this.getNotebookImage('/images/background-image.jpg', '/images/notebook.jpg');
   }
 
   getDeletedNotes(): void{
@@ -192,6 +196,41 @@ export class BinComponent {
     }
     else if(sortOption == "none"){
       this.getDeletedNotes()
+    }
+  }
+
+  //fetching the images of either the note or the notebook
+  async getNotebookImage(notebookFilePath: string, noteFilePath: string) {
+    await this.imageService.downloadImg(notebookFilePath).then((url: string) => {
+      console.log("Notebook Image URL:", url);
+      this.notebookImageUrl = url;
+    }).catch((error) => {
+      console.error("Error downloading notebook image:", error);
+    });
+  
+    await this.imageService.downloadImg(noteFilePath).then((url: string) => {
+      console.log("Note Image URL:", url);
+      this.noteImageUrl = url; 
+    }).catch((error) => {
+      console.error("Error downloading note image:", error);
+    });
+  
+    this.updateNotebookImage();
+  }
+  
+  updateNotebookImage(): void {
+    if (this.notebookImageUrl || this.noteImageUrl) {
+      for (let stuff of this.deletedStuff) {
+        if (stuff.type === 'notebook') {
+          stuff.img = this.notebookImageUrl;
+          console.log("Updated Notebook Image:", stuff.img);
+        } else if (stuff.type === 'note') {
+          stuff.img = this.noteImageUrl; 
+          console.log("Updated Note Image:", stuff.img);
+        }
+      }
+    } else {
+      console.log("No image URLs available.");
     }
   }
 }

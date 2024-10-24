@@ -29,11 +29,6 @@ export class BookDBServiceService {
     return from(setDoc(ref, notebookData));
   }
 
-  // updateNoteBook(notebook: Notebook): Observable<Notebook>{
-  //   const url = "http://localhost:3000/notebooks/" + notebook.id;
-  //   return this.http.patch<Notebook>(url, notebook);
-  // }
-
   updateNoteBook(notebook: Notebook) {
     const bookRef = doc(this.db, 'notebooks/' + notebook.id) as DocumentReference<Notebook>;
     
@@ -54,14 +49,9 @@ export class BookDBServiceService {
     return from(deleteDoc(bookRef));
   }
 
-  // deleteNoteBook(id: string): Observable<String>{
-  //   const url = "http://localhost:3000/notebooks/" + id;
-  //   return this.http.delete<String>(url);
-  // }
-
-  deleteDeletedNoteBook(id: string): Observable<String>{
-    const url = "http://localhost:3000/deletedNotes/" + id;
-    return this.http.delete<String>(url);
+  deleteDeletedNoteBook(id: string) {
+    const noteRef = doc(this.db, 'bin/' + id) as DocumentReference<Notebook>;
+    return from(deleteDoc(noteRef));
   }
 
   getSingleNotebook(id: string): Observable<Notebook | undefined>{
@@ -78,8 +68,3 @@ export class BookDBServiceService {
     )
   }
 }
-
-// getNotebooks(): Observable<Notebook[]>{
-//   const url = "http://localhost:3000/notebooks";
-//   return this.http.get<Notebook[]>(url);
-// }

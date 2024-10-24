@@ -1,21 +1,24 @@
 import { Component } from '@angular/core';
-import { Notebook } from '../models/notebooks.model';
+import { Notebook } from '../../models/notebooks.model';
 import { CommonModule } from '@angular/common';
-import { BookDBServiceService } from '../services/book-dbservice.service';
+import { BookDBServiceService } from '../../services/book-dbservice.service';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { NotesDBServiceService } from '../services/notes-dbservice.service';
-import { BinComponent } from '../bin/bin.component';
-import { Bin } from '../models/bin.model';
+import { NotesDBServiceService } from '../../services/notes-dbservice.service';
+import { BinComponent } from '../../bin/bin.component';
+import { Bin } from '../../models/bin.model';
 // import { HomeNotesComponent } from '../home-notes/home-notes.component';
-import { Note } from '../models/note.model';
-import { NotebookTitlePipe } from '../pipes/notebook-title.pipe';
+import { Note } from '../../models/note.model';
+import { NotebookTitlePipe } from '../../pipes/notebook-title.pipe';
 import { Timestamp } from '@angular/fire/firestore';
+import { ImageStorageService } from '../../image-storage.service';
+import { Subscription } from 'rxjs';
+import { SortingPipe } from '../../pipes/sorting.pipe';
 
 @Component({
   selector: 'app-notebooks',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, BinComponent, NotebookTitlePipe],
+  imports: [CommonModule, RouterModule, FormsModule, BinComponent, NotebookTitlePipe, SortingPipe],
   templateUrl: './notebooks.component.html',
   styleUrls: ['./notebooks.component.css'],
   providers: [BookDBServiceService, NotesDBServiceService]
@@ -34,12 +37,21 @@ export class NotebooksComponent {
   notes: Note[] = [];
   currentNBId: string = "";
   notesNumber: number = 0;
+  notebookImageUrl: string | null = ''
+  imageSubscription: Subscription | null = null;
+  sortType: string = '';;
 
-  constructor(private notebooksService: BookDBServiceService, private notesService: NotesDBServiceService) {}
+  constructor(private notebooksService: BookDBServiceService, private notesService: NotesDBServiceService, private imageService: ImageStorageService) {}
 
   ngOnInit() {
     this.getNoteBooks();
     this.getNotes();
+    // this.getNotebookImage();
+
+    // this.imageSubscription = this.imageService.latestImageUrl.subscribe((newImageUrl: string) => {
+    //   console.log("New Image URL received:", newImageUrl);
+    //   this.updateNotebooksImage(newImageUrl);
+    // });
   }
 
   getNoteBooks(): void {
@@ -270,37 +282,46 @@ export class NotebooksComponent {
   });
   }
 
-  //sorting by number fo notes
-  sortByNumberNotes(): void {
-    this.notebooks.sort((a, b) => {
-        const countA = new Date(a.notecount);
-        const countB = new Date(b.notecount);
-
-        if (countA > countB) {
-            return -1; 
-        }
-        if (countB < countA) {
-            return 1; 
-        }
-        return 0;
-    });
+  setSortType(type: string): void{
+    this.sortType = type;
   }
+
 
   handleSortChange(event: Event) {
     const sortOption = (event.target as HTMLSelectElement).value;
     console.log('Selected option:', sortOption);
     
-    if(sortOption == "alphabetically"){
-      this.sortNotesAlphabetically()
-    }
-    else if(sortOption == "dateCreated"){
-      this.sortNotebooksByDateCreated()
-    }
-    else if(sortOption == "numberNotes"){
-      this.sortByNumberNotes()
-    }
-    else if(sortOption == "none"){
-      this.getNoteBooks()
-    }
+    this.setSortType(sortOption);
   }
+
+  // async getNotebookImage() {
+  //   const filePath = '/images/background-image.jpg'; 
+  //   await this.imageService.downloadImg(filePath).then((url: string) => {
+  //     console.log(url)
+  //     this.notebookImageUrl = url;
+  //     this.updateNotebookImage();
+  //   }).catch((error) => {
+  //     console.error("Error downloading image:", error);
+  //   });;
+  // }
+
+  // updateNotebookImage(): void {
+  //   if (this.notebookImageUrl) {
+  //     for (let notebook of this.notebooks) {
+  //       notebook.img = this.notebookImageUrl;
+  //       console.log("Updated Notebook Image:", notebook.img);
+  //     }
+  //   } else {
+  //     console.log("No notebook image URL available.");
+  //   }
+  // }
+
+  // updateNotebooksImage(imageUrl: string): void {
+  //   this.notebooks.forEach(notebook => {
+  //     notebook.img = imageUrl; 
+  //     console.log(notebook.img);
+  //   });
+  //   console.log("All notebooks updated with new image URL.");
+  // }
+
 }

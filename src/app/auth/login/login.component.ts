@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { Route, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../auth.service';
@@ -15,8 +15,7 @@ import { AuthService } from '../auth.service';
 export class LoginComponent {
   form!: FormGroup;
   validators!: Validators;
-  //this password pattern should only be used for the signup form instead!
-  passwordPattern: RegExp = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/
+  validEmailPattern: RegExp = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   invalidLogin: boolean = false;
   token: string | null = null;
 
@@ -26,7 +25,7 @@ export class LoginComponent {
     this.invalidLogin = false;
     
     this.form = this.fb.group({
-      'email': [null, { validators: [Validators.required, Validators.email] }],
+      'email': [null, { validators: [Validators.required, this.validEmail.bind(this)] }],
       'password': [null, { validators: [Validators.required] }]
     })
   }
@@ -44,6 +43,16 @@ export class LoginComponent {
         this.router.navigate(['/']);
       }
     }); 
+  }
+
+  validEmail(control: FormControl): {[s:string]: boolean} | null {
+    if(!control.value){
+      return null;
+    }
+    if(!this.validEmailPattern.test(control.value)){
+      return {'invalidFormat': true};
+    }
+    return null;
   }
 
   get email(){

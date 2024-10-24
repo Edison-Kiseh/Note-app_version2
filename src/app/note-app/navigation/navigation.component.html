@@ -7,6 +7,9 @@
             <li class="nav-item">
                 <a class="nav-link" routerLinkActive="active" [routerLink]="'/notebooks'">Notebooks</a>
             </li>
+            <li class="nav-item" *ngIf="getUserPermissions()">
+                <a class="nav-link" routerLinkActive="active" [routerLink]="'/admin'">Administrator</a>
+            </li>
         </ul>
         <button  *ngIf="authService.isLoggedIn()" (click)="onLogout()" class="btn btn-primary">Logout</button>
         <!-- <img src="../../assets/images/pen.png"/> -->

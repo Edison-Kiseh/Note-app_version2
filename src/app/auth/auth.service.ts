@@ -1,17 +1,30 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Auth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from '@angular/fire/auth';
+import { doc, docData, DocumentReference, Firestore } from '@angular/fire/firestore';
+import { User } from '../models/user.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   token: string | null = null;
+  userId: string | null = null;
 
-  constructor(private router: Router, private auth: Auth) {
+  constructor(private router: Router, private auth: Auth, private db: Firestore) {
     if(localStorage.getItem('token')){
       this.token = localStorage.getItem('token');
     }
+
+    this.auth.onAuthStateChanged((user) => {
+      if (user) {
+        this.userId = user.uid;
+        console.log("User ID restored:", this.userId);
+      } else {
+        this.userId = null;
+        console.log("No user is logged in");
+      }
+    });
   }
 
   signup(email: string, password: string): Promise<string> {
@@ -41,6 +54,18 @@ export class AuthService {
       });
   }
 
+  deleteUser() {
+    const user = this.auth.currentUser;
+  
+    if(user) {
+      console.log("User deleted");
+      return user.delete();
+    } 
+    else {
+      return Promise.reject('No user is currently signed in.');
+    }
+  }
+  
   logout(): void{
     this.auth.signOut();
     this.token = null;
@@ -52,12 +77,7 @@ export class AuthService {
     return this.token != null;
   }
 
-  getUserID() {
-    if(this.auth.currentUser){
-      return this.auth.currentUser.uid;
-    }
-    else{
-      return null;
-    }
+  getUserID(): string | null {
+    return this.userId;
   }
 }

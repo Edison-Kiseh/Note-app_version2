@@ -36,11 +36,6 @@ export class NotesDBServiceService {
     return this.http.get<Note[]>(url);
   }
 
-  // addNote(note: Note): Observable<Note>{
-  //   const url = "http://localhost:3000/notes";
-  //   return this.http.post<Note>(url, note);
-  // }
-
   //adding a new notebook
   addNote(note: Note) {
     const newID = doc(collection(this.db, 'id')).id;
@@ -58,45 +53,6 @@ export class NotesDBServiceService {
 
     return from(setDoc(ref, noteData));
   }
-
-  //adding a new notebook
-  // addNote(note: Note) {
-  //   const newID = doc(collection(this.db, 'id')).id;
-  //   const ref = doc(this.db, 'notes/' + newID);
-
-  //   //doing this because setDoc requires a javascript object
-  //   const noteData = {
-  //     id: note.id,
-  //     img: note.img, 
-  //     notebookId: note.notebookId,
-  //     text: note.text,
-  //     time: note.time, 
-  //     title: note.title
-  //   };
-
-  //   return from(setDoc(ref, noteData));
-  // }
-
-  // updateNoteName(note: Note): Observable<Note>{
-  //   const url = `http://localhost:3000/notes/` + note.id;
-  //   return this.http.patch<Note>(url, note);
-  // }
-
-  // saveNoteTitle(noteId: string, updatedNote: Note): Observable<Note> {
-  //   const noteRef = doc(this.db, 'notes/' + updatedNote.id) as DocumentReference<Note>;
-    
-  //   //doing this because setDoc requires a javascript object
-  //   const noteData = {
-  //     id: updatedNote.id,
-  //     img: updatedNote.img, 
-  //     name: updatedNote.name,
-  //     notebookId: updatedNote.notebookId,
-  //     time: updatedNote.time, 
-  //     text: updatedNote.text
-  //   };
-    
-  //   return from(updateDoc(noteRef, noteData));
-  // }
   
   updateNote(note: Note) {
     const noteRef = doc(this.db, 'notes/' + note.id) as DocumentReference<Note>;
@@ -113,6 +69,18 @@ export class NotesDBServiceService {
     
     return from(updateDoc(noteRef, noteData));
   }
+
+  //to only update the text field of the note
+  updateNoteText(note: Note) {
+    const noteRef = doc(this.db, 'notes/' + note.id) as DocumentReference<Note>;
+    
+    const noteData = {
+      text: note.text
+    };
+    
+    return from(updateDoc(noteRef, noteData));
+  }
+  
 
   moveNoteToRecycleBin(stuff: Bin) {
     const newID = doc(collection(this.db, 'id')).id;

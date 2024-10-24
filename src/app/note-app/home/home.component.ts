@@ -1,28 +1,31 @@
-import { Component, OnChanges, Output, SimpleChanges, EventEmitter } from '@angular/core';
+import { Component, OnChanges, Output, SimpleChanges, EventEmitter, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { QuillModule } from 'ngx-quill';
 import Quill from 'quill';
 import { RouterModule } from '@angular/router';
-import { NotebookTitlePipe } from '../pipes/notebook-title.pipe';
-import { Note } from '../models/note.model';
-import { Notebook } from '../models/notebooks.model';
+import { NotebookTitlePipe } from '../../pipes/notebook-title.pipe';
+import { Note } from '../../models/note.model';
+import { Notebook } from '../../models/notebooks.model';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { BookDBServiceService } from '../services/book-dbservice.service';
-import { NotesDBServiceService } from '../services/notes-dbservice.service';
+import { BookDBServiceService } from '../../services/book-dbservice.service';
+import { NotesDBServiceService } from '../../services/notes-dbservice.service';
 import { HomeNotesComponent } from '../home-notes/home-notes.component';
 import { HomeNotebooksComponent } from '../home-notebooks/home-notebooks.component';
-import { Bin } from '../models/bin.model';
+import { Bin } from '../../models/bin.model';
 import { ActivatedRoute, Params, Router } from '@angular/router';
-import { NoteparentTitlePipe } from '../pipes/noteparent-title.pipe';
+import { NoteparentTitlePipe } from '../../pipes/noteparent-title.pipe';
 import { Subscription } from 'rxjs';
-import { WordCountDirective } from '../word-count.directive';
 import { Timestamp } from '@angular/fire/firestore';
+import { AuthService } from '../../auth/auth.service';
+import { WordCountDirective } from '../../word-count.directive';
+import { SortingPipe } from '../../pipes/sorting.pipe';
+import { ImageStorageService } from '../../image-storage.service';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [FormsModule, QuillModule, RouterModule, NotebookTitlePipe, CommonModule, HomeNotebooksComponent, HomeNotesComponent, NoteparentTitlePipe, WordCountDirective],
+  imports: [WordCountDirective, FormsModule, QuillModule, RouterModule, NotebookTitlePipe, CommonModule, HomeNotebooksComponent, HomeNotesComponent, NoteparentTitlePipe, SortingPipe],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
   providers:[BookDBServiceService, NotesDBServiceService]
@@ -32,7 +35,7 @@ import { Timestamp } from '@angular/fire/firestore';
 export class HomeComponent {
   notebookName: string = ""
   noteTitle: string = ""
-  text: string = ""
+  text: string | null = ""
   notebooks: Notebook[] = []
   notes: Note[] = []
   tempNotesArray: Note[] = []
@@ -57,10 +60,14 @@ export class HomeComponent {
   notebookActivated: boolean = false
   notebookSubscription!: Subscription;
   numberOfWords: number = 0;
+  sortType: string = '';
+  notebookImageUrl: string | null = null;
+  wordCount: number = 0;
 
-  constructor(private route: ActivatedRoute, private notebooksService: BookDBServiceService, private notesService: NotesDBServiceService){}
+  constructor(private authService: AuthService, private route: ActivatedRoute, private notebooksService: BookDBServiceService, private notesService: NotesDBServiceService, private imageService: ImageStorageService){}
   private nextNoteId: number = 1;
   private nextNoteBookId: number = 1;
+  @ViewChild(WordCountDirective) wordCountDirective!: WordCountDirective;
 
   toolbarOptions = [
     [{ 'font': [] }],
@@ -88,6 +95,8 @@ export class HomeComponent {
       this.getNotes();
     }
 
+    console.log(this.authService.getUserID());
+
     //the note text area
     this.noteTextArea = new Quill('#editor', {
       modules: {
@@ -99,10 +108,26 @@ export class HomeComponent {
     this.noteTextArea.on('text-change', (delta, oldDelta, source) => {
       if (source === 'user') {
         console.log('Text changed by user');
-
-        this.handleTextChanged();
+        // this.handleTextChanged();
       }
     });
+
+    this.updateText();
+    // this.getNotebookImage();
+  }
+
+  getText(): string | null{
+    if(this.noteTextArea?.root.innerHTML){
+      console.log("The text" + this.noteTextArea.root.innerHTML);
+      return this.noteTextArea.root.innerHTML;
+    }
+    else{
+      return null;
+    }
+  }
+
+  updateText(): void{
+    this.text = this.getText();
   }
 
   getNoteBooks(): void{
@@ -151,7 +176,7 @@ export class HomeComponent {
     this.notesService.addNote(newNote).subscribe({
       next: () => {
         console.log('New note added');
-        this.notes.push(newNote); // Push the new instance into the array
+        // this.notes.push(newNote); // Push the new instance into the array
         // this.getNotes();
       },
       error: (error) => console.log('Adding note error ', error)
@@ -269,7 +294,7 @@ export class HomeComponent {
       this.notes[this.currentNoteIndex].text = newText;
   
       // Save the updated note text to the database
-      this.notesService.updateNote(this.notes[this.currentNoteIndex]).subscribe({
+      this.notesService.updateNoteText(this.notes[this.currentNoteIndex]).subscribe({
         next: () => {
           console.log('Note text updated');
         },
@@ -388,60 +413,35 @@ export class HomeComponent {
     this.showListFlag = false;
   }
 
-
-  //sorting of the notes 
-
-  //sorting alphabetically
-  sortNotesAlphabetically(): void {
-    this.notes.sort((a, b) => {
-        const titleA = a.name.toUpperCase(); // Convert titles to uppercase
-        const titleB = b.name.toUpperCase();
-        if (titleA < titleB) {
-            return -1; // Title A comes before title B
-        }
-        if (titleA > titleB) {
-            return 1; // Title A comes after title B
-        }
-        return 0; // Titles are equal
-    });
+  setSortType(type: string): void{
+    this.sortType = type;
   }
 
-  //sorting by date
-  sortNotesByDateCreated(): void {
-    this.notes.sort((a, b) => {
-      const dateA = a.time.toDate();
-      const dateB = a.time.toDate();
+  // async getNotebookImage() {
+  //   const filePath = '/images/background-image.jpg'; 
+  //   await this.imageService.downloadImg(filePath).then((url: string) => {
+  //     console.log(url)
+  //     this.notebookImageUrl = url;
+  //     this.updateNotebookImage();
+  //   }).catch((error) => {
+  //     console.error("Error downloading image:", error);
+  //   });;
+  // }
 
-        if (dateA < dateB) {
-            return -1; 
-        }
-        if (dateA > dateB) {
-            return 1; 
-        }
-        return 0;
-    });
-  }
+  // updateNotebookImage(): void {
+  //   if (this.notebookImageUrl) {
+  //     for (let notebook of this.notebooks) {
+  //       notebook.img = this.notebookImageUrl;
+  //       console.log("Updated Notebook Image:", notebook.img);
+  //     }
+  //   } else {
+  //     console.log("No notebook image URL available.");
+  //   }
+  // }
 
-  //search function to filter notes based on user search
-  filterBy() {
-    const searchTerm = this.notesSearchContent.toLowerCase().trim(); // Get the search term from the input element  
-    
-    if (searchTerm) {
-      // Filter notes based on the search term
-      this.notes = this.tempNotesArray.filter(n => n.name.toLowerCase().includes(searchTerm));
-    } else {
-      // If the search term is empty, restore the original list of notes
-      this.notes = [...this.tempNotesArray];    }
-  }
-
-  getRandomColour(): string {
-    const letters = '0123456789ABCDEF';
-    let colour = '#';
-    for (let i = 0; i < 6; i++) {
-      colour += letters[Math.floor(Math.random() * 16)];
-    }
-    return colour;
-  }
+  // updateWordCount(count: number) {
+  //   this.wordCount = count;
+  // }
 
   ngOnDestroy(): void{
     if(this.notebookSubscription){
