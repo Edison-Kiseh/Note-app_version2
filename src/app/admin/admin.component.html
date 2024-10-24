@@ -21,14 +21,26 @@
 
 </table> -->
 
+<h2>Image Upload</h2>
+<div style="display: flex; justify-content: space-around;">
+    <div>
+        <h4>Change notebook image</h4>
+        <input type="file" (change)="selectImg($event)" accept="image/*" />
+        <button (click)="setFile('notebook')" [disabled]="!file">Upload Image</button>
+        <div *ngIf="imageUrl">
+          <p>Uploaded Image URL: {{ imageUrl }}</p>
+          <img [src]="imageUrl" alt="Uploaded Image" style="max-width: 300px; max-height: 300px;" />
+        </div>
+    </div>
 
-<div>
-    <h2>Image Upload</h2>
-    <input type="file" (change)="selectImg($event)" accept="image/*" />
-    <button (click)="setFile()" [disabled]="!file">Upload Image</button>
-    <div *ngIf="imageUrl">
-      <p>Uploaded Image URL: {{ imageUrl }}</p>
-      <img [src]="imageUrl" alt="Uploaded Image" style="max-width: 300px; max-height: 300px;" />
+    <div>
+        <h4>Change note image</h4>
+        <input type="file" (change)="selectImg($event)" accept="image/*" />
+        <button (click)="setFile('note')" [disabled]="!file">Upload Image</button>
+        <div *ngIf="imageUrl">
+          <p>Uploaded Image URL: {{ imageUrl }}</p>
+          <img [src]="imageUrl" alt="Uploaded Image" style="max-width: 300px; max-height: 300px;" />
+        </div>
     </div>
 </div>
 

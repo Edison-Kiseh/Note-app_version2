@@ -7,6 +7,7 @@ import { BookDBServiceService } from './services/book-dbservice.service';
 import { BinService } from './services/bin.service';
 import { Bin } from './models/bin.model';
 import { NotesDBServiceService } from './services/notes-dbservice.service';
+import { Note } from './models/note.model';
 
 @Injectable({
   providedIn: 'root'
@@ -16,6 +17,7 @@ export class ImageStorageService {
   notebooks: Notebook[] = [];
   bin: Bin = new Bin;
   deletedStuff: Bin[] = [];
+  notes: Note[] = [];
 
   constructor(private noteService: NotesDBServiceService, private storage: Storage, private db: Firestore, private notebooksService: BookDBServiceService, private binService: BinService) {}
 
@@ -49,36 +51,54 @@ export class ImageStorageService {
     }
   }
 
-  async uploadImage(path: string, file: File): Promise<string> {
+  async uploadImage(path: string, file: File, imageType: string): Promise<string> {
     const storageRef = ref(this.storage, path);
     const task = uploadBytesResumable(storageRef, file);
     await task;
     const url = await getDownloadURL(storageRef);
-    this.updateNotebookImages(url);
+    this.updateNotebookImages(url, imageType);
     this.latestImageUrl.next(url); 
     return url;
   }
 
-  updateNotebookImages(url: string) {
+  updateNotebookImages(url: string, imageType: string) {
     // Fetching all notebooks
     this.notebooksService.getNotebooks().subscribe({
       next: (books: Notebook[]) => {
         this.notebooks = books; 
 
         // Use map to create an array of promises
-        const updatePromises = this.notebooks.map((notebook) => {
-          notebook.img = url;
-          // this.setupBinItem(notebook);
-
-          this.notebooksService.updateNoteBook(notebook); 
-        });
+        if(imageType === 'notebook'){
+          const updatePromises = this.notebooks.map((notebook) => {
+            notebook.img = url;
+            // this.setupBinItem(notebook);
   
-        try {
-          // Waiting for all updates to complete
-          Promise.all(updatePromises);
-          console.log('All notebooks updated successfully with the new image URL:', url);
-        } catch (error) {
-          console.error('Error updating notebooks:', error); 
+            this.notebooksService.updateNoteBook(notebook); 
+          });
+
+          try {
+            // Waiting for all updates to complete
+            Promise.all(updatePromises);
+            console.log('All notebooks updated successfully with the new image URL:', url);
+          } catch (error) {
+            console.error('Error updating notebooks:', error); 
+          }
+        }
+        else{
+          const updatePromises = this.notes.map((note) => {
+            note.img = url;
+            // this.setupBinItem(notebook);
+  
+            this.noteService.updateNote(note);
+          });
+
+          try {
+            // Waiting for all updates to complete
+            Promise.all(updatePromises);
+            console.log('All notebooks updated successfully with the new image URL:', url);
+          } catch (error) {
+            console.error('Error updating notebooks:', error); 
+          }
         }
       },
       error: (error) => console.log('Error fetching notebooks: ', error)
@@ -100,28 +120,20 @@ export class ImageStorageService {
           if(del.type === "notebook"){
             this.binService.updateStuff(del);
           }
+          else{
+            this.binService.updateStuff(del);
+          }
         });
 
         try {
           // Waiting for all updates to complete
           Promise.all(updatePromises);
-          console.log('All notebooks in the bin updated successfully with the new image URL:', url);
+          console.log('Everything in the bin updated successfully with the new image URL:', url);
         } catch (error) {
           console.error('Error updating bin items:', error); 
         }
       },
       error: (error) => console.log('Error fetching bin items: ', error)
     })
-  }
-
-  setupBinItem(notebook: Notebook) {
-    //setting up for updating in the bin
-    this.bin.id = notebook.id;
-    this.bin.img = notebook.img;
-    this.bin.name = notebook.name;
-    this.bin.text = '';
-    this.bin.time = notebook.time;
-    this.bin.type = 'notebook';
-    
   }
 }

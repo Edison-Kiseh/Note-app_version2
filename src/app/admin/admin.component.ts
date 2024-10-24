@@ -76,11 +76,11 @@ export class AdminComponent {
     }
   }
   
-  async setFile(): Promise<void> {
+  async setFile(imageType: string): Promise<void> {
     if (this.file) {
       const path = 'images/' + this.file.name; 
       try {
-        this.imageUrl = await this.imageStorage.uploadImage(path, this.file); 
+        this.imageUrl = await this.imageStorage.uploadImage(path, this.file, imageType); 
         this.imageUploaded = true;
         console.log("Uploaded Image URL:", this.imageUrl);
       } catch (error) {
